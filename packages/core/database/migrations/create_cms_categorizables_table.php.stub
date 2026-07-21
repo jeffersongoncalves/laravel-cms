@@ -1,0 +1,28 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        $prefix = config('cms-core.table_prefix') ?? '';
+
+        Schema::create($prefix.'categorizables', function (Blueprint $table) use ($prefix) {
+            $table->foreignId('category_id')->constrained($prefix.'categories')->cascadeOnDelete();
+            $table->morphs('categorizable');
+            $table->timestamps();
+
+            $table->primary(['category_id', 'categorizable_id', 'categorizable_type'], 'categorizables_primary');
+        });
+    }
+
+    public function down(): void
+    {
+        $prefix = config('cms-core.table_prefix') ?? '';
+
+        Schema::dropIfExists($prefix.'categorizables');
+    }
+};

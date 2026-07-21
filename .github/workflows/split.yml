@@ -1,0 +1,55 @@
+name: Split Monorepo
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+
+jobs:
+  split:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - { local: suite, split: laravel-cms-suite }
+          - { local: core,  split: laravel-cms-core }
+          - { local: media, split: laravel-cms-media }
+          - { local: menu,  split: laravel-cms-menu }
+
+    name: Split ${{ matrix.package.split }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      # Push the current branch subtree to the read-only mirror.
+      - name: Split (branch)
+        if: "!startsWith(github.ref, 'refs/tags/')"
+        uses: symplify/monorepo-split-github-action@v2.3.0
+        with:
+          package_directory: 'packages/${{ matrix.package.local }}'
+          repository_organization: jeffersongoncalves
+          repository_name: ${{ matrix.package.split }}
+          branch: ${{ github.ref_name }}
+          user_name: jeffersongoncalves
+          user_email: gerson.simao.92@gmail.com
+        env:
+          GITHUB_TOKEN: ${{ secrets.SPLIT_TOKEN }}
+
+      # Propagate a newly created tag to the read-only mirror.
+      - name: Split (tag)
+        if: "startsWith(github.ref, 'refs/tags/')"
+        uses: symplify/monorepo-split-github-action@v2.3.0
+        with:
+          tag: ${{ github.ref_name }}
+          package_directory: 'packages/${{ matrix.package.local }}'
+          repository_organization: jeffersongoncalves
+          repository_name: ${{ matrix.package.split }}
+          user_name: jeffersongoncalves
+          user_email: gerson.simao.92@gmail.com
+        env:
+          GITHUB_TOKEN: ${{ secrets.SPLIT_TOKEN }}

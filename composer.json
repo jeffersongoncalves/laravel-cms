@@ -1,0 +1,62 @@
+{
+    "name": "jeffersongoncalves/laravel-cms-monorepo",
+    "description": "Development monorepo (source-of-truth, not published) for the Laravel CMS ecosystem. Component packages split read-only into jeffersongoncalves/laravel-cms-* and the umbrella into jeffersongoncalves/laravel-cms.",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jefferson Gonçalves",
+            "email": "gerson.simao.92@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "illuminate/contracts": "^11.0|^12.0|^13.0",
+        "illuminate/database": "^11.0|^12.0|^13.0",
+        "illuminate/events": "^11.0|^12.0|^13.0",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "spatie/laravel-package-tools": "^1.15",
+        "spatie/laravel-translatable": "^6.11",
+        "spatie/laravel-sitemap": "^7.3",
+        "spatie/laravel-medialibrary": "^11.0|^12.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^2.9|^3.0",
+        "laravel/pint": "^1.0",
+        "nunomaduro/collision": "^8.0",
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
+        "pestphp/pest": "^3.0|^4.0",
+        "pestphp/pest-plugin-laravel": "^3.0|^4.0",
+        "symplify/monorepo-builder": "^11.2"
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "JeffersonGoncalves\\Cms\\Suite\\": "packages/suite/src",
+            "JeffersonGoncalves\\Cms\\Suite\\Tests\\": "packages/suite/tests",
+            "JeffersonGoncalves\\Cms\\Core\\": "packages/core/src",
+            "JeffersonGoncalves\\Cms\\Core\\Tests\\": "packages/core/tests",
+            "JeffersonGoncalves\\Cms\\Core\\Database\\Factories\\": "packages/core/database/factories",
+            "JeffersonGoncalves\\Cms\\Media\\": "packages/media/src",
+            "JeffersonGoncalves\\Cms\\Media\\Tests\\": "packages/media/tests",
+            "JeffersonGoncalves\\Cms\\Menu\\": "packages/menu/src",
+            "JeffersonGoncalves\\Cms\\Menu\\Tests\\": "packages/menu/tests",
+            "JeffersonGoncalves\\Cms\\Menu\\Database\\Factories\\": "packages/menu/database/factories"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/pest",
+        "test-coverage": "vendor/bin/pest --coverage",
+        "format": "vendor/bin/pint",
+        "analyse": "vendor/bin/phpstan analyse"
+    },
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true,
+            "phpstan/extension-installer": true
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
