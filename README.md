@@ -1,5 +1,7 @@
 # Laravel CMS Monorepo
 
+![Laravel CMS](https://raw.githubusercontent.com/jeffersongoncalves/laravel-cms/main/art/jeffersongoncalves-laravel-cms.png)
+
 Development monorepo (source-of-truth, not published) for the Laravel CMS ecosystem.
 
 Backend-only: models, migrations, config, contracts. No routes/controllers/API — admin UI is provided by the separate `filament-cms` package.

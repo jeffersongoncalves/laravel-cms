@@ -1,5 +1,7 @@
 # Laravel CMS
 
+![Laravel CMS](https://raw.githubusercontent.com/jeffersongoncalves/laravel-cms/main/art/jeffersongoncalves-laravel-cms.png)
+
 Umbrella meta-package bundling the full Laravel CMS ecosystem: `laravel-cms-core`, `laravel-cms-media`, `laravel-cms-menu`.
 
 ```bash

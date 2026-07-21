@@ -1,3 +1,9 @@
+<div class="filament-hidden">
+
+![Laravel CMS Core](https://raw.githubusercontent.com/jeffersongoncalves/laravel-cms-core/main/art/jeffersongoncalves-laravel-cms-core.png)
+
+</div>
+
 # Laravel CMS Core
 
 Pages, posts, categories, tags, comments, revisions, SEO metadata, i18n and sitemap generation. Backend-only: models, migrations, config — no routes, controllers or API.

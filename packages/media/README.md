@@ -1,3 +1,9 @@
+<div class="filament-hidden">
+
+![Laravel CMS Media](https://raw.githubusercontent.com/jeffersongoncalves/laravel-cms-media/main/art/jeffersongoncalves-laravel-cms-media.png)
+
+</div>
+
 # Laravel CMS Media
 
 Media library integration for the Laravel CMS ecosystem — thin wrapper around `spatie/laravel-medialibrary` with config-driven collections and conversions.

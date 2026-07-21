@@ -1,3 +1,9 @@
+<div class="filament-hidden">
+
+![Laravel CMS Menu](https://raw.githubusercontent.com/jeffersongoncalves/laravel-cms-menu/main/art/jeffersongoncalves-laravel-cms-menu.png)
+
+</div>
+
 # Laravel CMS Menu
 
 Navigation menus and menu items — hierarchical, translatable labels, optionally linked to any polymorphic model. Backend-only: models, migrations, config.
