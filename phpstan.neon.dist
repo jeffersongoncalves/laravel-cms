@@ -3,10 +3,7 @@ includes:
 
 parameters:
     paths:
-        - packages/suite/src
-        - packages/core/src
-        - packages/media/src
-        - packages/media/tests/Fixtures
-        - packages/menu/src
+        - src
+        - tests/Fixtures
     level: 5
     ignoreErrors: []
