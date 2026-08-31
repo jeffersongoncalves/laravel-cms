@@ -33,11 +33,7 @@ abstract class TestCase extends Orchestra
     protected function getEnvironmentSetUp($app): void
     {
         $app['config']->set('database.default', 'testing');
-        $app['config']->set('database.connections.testing', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
+        $app['config']->set('database.connections.testing', $this->testing_connection());
 
         $app['config']->set('filesystems.disks.media', [
             'driver' => 'local',
@@ -53,6 +49,56 @@ abstract class TestCase extends Orchestra
         }
     }
 
+    /**
+     * Defaults to an in-memory SQLite connection for local development; CI
+     * (tests.yml) sets CMS_TEST_DB_* to run the same suite against real
+     * MySQL and PostgreSQL instances too. Deliberately not the plain DB_*
+     * names: Orchestra Testbench itself sets DB_CONNECTION=testing by
+     * convention, which would collide with (and always win over) a driver
+     * value read from the same variable here.
+     *
+     * @return array<string, mixed>
+     */
+    protected function testing_connection(): array
+    {
+        $driver = env('CMS_TEST_DB_DRIVER', 'sqlite');
+
+        if ($driver === 'sqlite') {
+            return ['driver' => 'sqlite', 'database' => ':memory:', 'prefix' => ''];
+        }
+
+        return [
+            'driver' => $driver,
+            'host' => env('CMS_TEST_DB_HOST', '127.0.0.1'),
+            'port' => env('CMS_TEST_DB_PORT'),
+            'database' => env('CMS_TEST_DB_DATABASE', 'testing'),
+            'username' => env('CMS_TEST_DB_USERNAME', 'root'),
+            'password' => env('CMS_TEST_DB_PASSWORD', ''),
+            'charset' => $driver === 'pgsql' ? 'utf8' : 'utf8mb4',
+            'prefix' => '',
+        ];
+    }
+
+    /**
+     * Same order as CmsServiceProvider::hasMigrations(). SQLite doesn't
+     * enforce foreign keys at CREATE TABLE time, but MySQL/Postgres do, and
+     * alphabetical order breaks it here: e.g. "categorizables" sorts before
+     * "categories" it references ('_' < 's' in ASCII).
+     */
+    private const MIGRATION_ORDER = [
+        'create_cms_pages_table',
+        'create_cms_posts_table',
+        'create_cms_categories_table',
+        'create_cms_tags_table',
+        'create_cms_categorizables_table',
+        'create_cms_taggables_table',
+        'create_cms_comments_table',
+        'create_cms_revisions_table',
+        'create_cms_seo_metas_table',
+        'create_cms_menus_table',
+        'create_cms_menu_items_table',
+    ];
+
     protected function defineDatabaseMigrations(): void
     {
         $stubsPath = __DIR__.'/../database/migrations';
@@ -62,17 +108,12 @@ abstract class TestCase extends Orchestra
             mkdir($tempPath, 0755, true);
         }
 
-        foreach (glob($stubsPath.'/*.php.stub') as $stub) {
-            $filename = basename(str_replace('.php.stub', '.php', $stub));
-            $target = $tempPath.'/'.$filename;
-
-            if (! file_exists($target)) {
-                copy($stub, $target);
-            }
+        foreach (self::MIGRATION_ORDER as $index => $name) {
+            copy($stubsPath.'/'.$name.'.php.stub', $tempPath.'/'.sprintf('%03d_%s.php', $index, $name));
         }
 
         $mediaStub = __DIR__.'/../vendor/spatie/laravel-medialibrary/database/migrations/create_media_table.php.stub';
-        $mediaTarget = $tempPath.'/create_media_table.php';
+        $mediaTarget = $tempPath.'/999_create_media_table.php';
         if (file_exists($mediaStub) && ! file_exists($mediaTarget)) {
             copy($mediaStub, $mediaTarget);
         }
