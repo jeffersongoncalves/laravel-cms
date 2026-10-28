@@ -5,11 +5,13 @@ namespace JeffersonGoncalves\Cms\Tests;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use JeffersonGoncalves\Cms\CmsServiceProvider;
+use JeffersonGoncalves\PestPluginDatabaseMigrations\LoadsPackageMigrations;
 use Orchestra\Testbench\TestCase as Orchestra;
 use Spatie\MediaLibrary\MediaLibraryServiceProvider;
 
 abstract class TestCase extends Orchestra
 {
+    use LoadsPackageMigrations;
     use RefreshDatabase;
 
     protected function setUp(): void
@@ -78,57 +80,9 @@ abstract class TestCase extends Orchestra
         ];
     }
 
-    /**
-     * Same order as CmsServiceProvider::hasMigrations(). SQLite doesn't
-     * enforce foreign keys at CREATE TABLE time, but MySQL/Postgres do, and
-     * alphabetical order breaks it here: e.g. "categorizables" sorts before
-     * "categories" it references ('_' < 's' in ASCII).
-     */
-    private const MIGRATION_ORDER = [
-        'create_cms_pages_table',
-        'create_cms_posts_table',
-        'create_cms_categories_table',
-        'create_cms_tags_table',
-        'create_cms_categorizables_table',
-        'create_cms_taggables_table',
-        'create_cms_comments_table',
-        'create_cms_revisions_table',
-        'create_cms_seo_metas_table',
-        'create_cms_menus_table',
-        'create_cms_menu_items_table',
-    ];
-
     protected function defineDatabaseMigrations(): void
     {
-        $stubsPath = __DIR__.'/../database/migrations';
-        $tempPath = sys_get_temp_dir().'/laravel-cms-migrations';
-
-        if (! is_dir($tempPath)) {
-            mkdir($tempPath, 0755, true);
-        }
-
-        foreach (self::MIGRATION_ORDER as $index => $name) {
-            copy($stubsPath.'/'.$name.'.php.stub', $tempPath.'/'.sprintf('%03d_%s.php', $index, $name));
-        }
-
-        $mediaStub = __DIR__.'/../vendor/spatie/laravel-medialibrary/database/migrations/create_media_table.php.stub';
-        $mediaTarget = $tempPath.'/999_create_media_table.php';
-        if (file_exists($mediaStub) && ! file_exists($mediaTarget)) {
-            copy($mediaStub, $mediaTarget);
-        }
-
-        // A real migration (not a standalone Schema::create call) so it is
-        // recreated by `migrate:fresh` whenever RefreshDatabase re-migrates
-        // mid-suite. A side-channel Schema::hasTable()-guarded create ran
-        // before RefreshDatabase's transaction began, so it survived that
-        // transaction's rollback but was silently dropped — and never
-        // recreated — the moment any later test's migrate:fresh reset fired.
-        $fixtureStub = __DIR__.'/Fixtures/create_cms_media_test_articles_table.php.stub';
-        $fixtureTarget = $tempPath.'/998_create_cms_media_test_articles_table.php';
-        if (file_exists($fixtureStub) && ! file_exists($fixtureTarget)) {
-            copy($fixtureStub, $fixtureTarget);
-        }
-
-        $this->loadMigrationsFrom($tempPath);
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations');
+        $this->loadPackageMigrations(CmsServiceProvider::class, MediaLibraryServiceProvider::class);
     }
 }
